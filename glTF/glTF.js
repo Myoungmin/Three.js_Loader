@@ -65,6 +65,9 @@ class App {
         camera.position.z = 2;
         // 다른 메서드에서 참조할 수 있도록 필드에 정의한다.
         this._camera = camera;
+
+        // 카메라를 장면에 추가
+        this._scene.add(this._camera);
     }
 
     _setupLight() {
@@ -76,8 +79,11 @@ class App {
         const light = new Three.DirectionalLight(color, intensity);
         // 광원 위치 설정
         light.position.set(-1, 2, 4);
-        // Scene객체에 광원 추가
-        this._scene.add(light);
+        // // Scene객체에 광원 추가
+        // this._scene.add(light);
+
+        // 광원을 카메라에 추가
+        this._camera.add(light);
 
         // AmbientLight 추가
         const ambientLight = new Three.AmbientLight(0xffffff, 1);
