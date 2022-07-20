@@ -62,7 +62,7 @@ class App {
             0.1,
             100
         );
-        camera.position.z = 2;
+        camera.position.z = 4;
         // 다른 메서드에서 참조할 수 있도록 필드에 정의한다.
         this._camera = camera;
 
@@ -101,8 +101,51 @@ class App {
                 const root = gltf.scene;
                 // 모델의 scene을 장면에 추가
                 this._scene.add(root);
+
+                // 모델을 로드한 후 카메라를 적당한 거리에 위치시킨다.
+                this._zoomFit(root, this._camera);
             }
         );
+    }
+
+    // 카메라를 적당한 거리에 위치시키는 메서드
+    // 파라미터 object3D : 로드한 3D 모델
+    _zoomFit(objct3D, camera){
+        // 모델의 경계 박스
+        const box = new Three.Box3().setFromObject(objct3D);
+
+        // 모델의 경계 박스 대각 길이
+        const sizeBox = box.getSize(new Three.Vector3()).length();
+
+        // 모델의 경계 박스 중심 위치
+        const centerBox = box.getCenter(new Three.Vector3());
+
+        // 모델 크기의 절반값
+        const halfSizeModel = sizeBox * 0.5;
+
+        // 카메라의 fov의 절반값
+        const halffov = Three.MathUtils.degToRad(camera.fov * 0.5);
+
+        // 모델을 화면에 꽉 채우기 위한 적당한 거리
+        const distance = halfSizeModel / Math.tan(halffov);
+
+        // 모델을 중심에서 카메라 위치로 향하는 방향 단위 벡터 계산
+        // 두 위치 벡터를 빼줘서 방향을 구한다.
+        const direction = (new Three.Vector3()).subVectors(camera.position, centerBox).normalize();
+
+        // "단위 방향 벡터" 방향으로, 모델 중심 위치로부터 distance 거리만큼 떨어진 위치
+        const position = direction.multiplyScalar(distance).add(centerBox);
+        camera.position.copy(position);
+
+        // 모델의 크기에 맞춰 카메라의 near, far 값을 대략적으로 조정
+        camera.near = sizeBox / 100;
+        camera.far = sizeBox * 100;
+
+        // 카메라 기본 속성 변경에 따른 투영행렬 업데이트
+        camera.updateProjectionMatrix();
+
+        // 카메라가 모델의 중심을 바라보도록 조정
+        camera.lookAt(centerBox.x, centerBox.y, centerBox.z);
     }
 
     _setupControls() {
