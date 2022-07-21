@@ -1,5 +1,6 @@
 import * as Three from '../three.js/three.module.js';
 import { OrbitControls } from '../three.js/OrbitControls.js';
+import { FBXLoader } from '../three.js/FBXLoader.js';
 
 class App {
     constructor() {
