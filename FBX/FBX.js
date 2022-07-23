@@ -107,8 +107,10 @@ class App {
         camera.position.set(
             centerBox.x + offsetX, centerBox.y + offsetY, centerBox.z + offsetZ);
 
+        const margin = 10;
         // 모델 크기의 절반값
-        const halfSizeModel = sizeBox * 0.5;
+        // 모델이 너무 딱 맞아 보여서 margin값을 더해줬다.
+        const halfSizeModel = (sizeBox + margin) * 0.5;
         // 카메라의 fov의 절반값
         const halfFov = Three.MathUtils.degToRad(camera.fov * .5);
         // 모델을 화면에 꽉 채우기 위한 적당한 거리
@@ -130,20 +132,22 @@ class App {
 
         // 카메라가 모델의 중심을 바라보도록 조정
         camera.lookAt(centerBox.x, centerBox.y, centerBox.z);
+
+        // Control의 target도 모델 중심으로 하여 모델 하단을 축으로 움직이는 것 방지
         this._controls.target.set(centerBox.x, centerBox.y, centerBox.z);
     }
 
     _setupModel() {
         const loader = new FBXLoader();
-        loader.load('../data/Shark.fbx', object => {
+        loader.load('../data/d_dom_3et.fbx', object => {
             this._scene.add(object);
 
-            this._zoomFit(object, this._camera, "Z", true);
+            this._zoomFit(object, this._camera, "X", true);
         });
     }
 
     _setupControls() {
-        new OrbitControls(this._camera, this._divContainer);
+        this._controls = new OrbitControls(this._camera, this._divContainer);
     }
 
     resize() {
